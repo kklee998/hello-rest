@@ -4,6 +4,21 @@ from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from config import config
 
+from marshmallow import ValidationError
+
+def not_json():
+     return jsonify(
+            status="ERROR",
+            message="Invalid data, please send JSON data"
+        ), 415
+
+def validation_error(errors):
+    return jsonify(
+            status="ERROR",
+            message="Validation Error",
+            errors=errors.normalized_messages()
+        ), 400
+
 app = Flask(__name__)
 app.config.from_object(config['development'])
 
