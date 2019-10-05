@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from .models import db, Journal, JournalSchema
-
+from sqlalchemy import exc
 
 from .utils import *
 
@@ -61,13 +61,13 @@ def create_journal():
 
     try:
         db.session.commit()
-    except SQLAlchemyError as errors:
+    except exc.SQLAlchemyError as errors:
         db.session.rollback()
         return jsonify(
             status="ERROR",
             message="DATABASE SESSION ERROR",
-            error=errors
-        )
+            error=errors._message()
+        ), 500
     
     result = journal_schema.dump(validated_data)
 
@@ -110,7 +110,15 @@ def get_all_journals():
     "status": "SUCCESS
     }
     """
-    journals = Journal.query.all()
+    try:
+        journals = Journal.query.all()
+    except exc.SQLAlchemyError as errors:
+        return jsonify(
+            status="ERROR",
+            message="DATABASE SESSION ERROR",
+            error=errors._message()
+        ), 500
+        
     journal_data = journals_schema.dump(journals)
 
     return jsonify(
@@ -135,7 +143,15 @@ def get_one_journal(pk):
     "status": "SUCCESS"
     }
     """
-    journal = Journal.query.get_or_404(pk)
+    try:
+        journal = Journal.query.get_or_404(pk)
+    except exc.SQLAlchemyError as errors:
+        return jsonify(
+            status="ERROR",
+            message="DATABASE SESSION ERROR",
+            error=errors._message()
+        ), 500
+    
     journal_data = journal_schema.dump(journal)
 
     return jsonify(
@@ -147,11 +163,19 @@ def get_one_journal(pk):
 def delete_one_journal(pk):
     """Deletes a single journal based on id. Returns nothing
     """
-    journal = Journal.query.get_or_404(pk)
+    try:
+        journal = Journal.query.get_or_404(pk)
+    except exc.SQLAlchemyError as errors:
+        return jsonify(
+            status="ERROR",
+            message="DATABASE SESSION ERROR",
+            error=errors._message()
+        ), 500
+    
     db.session.delete(journal)
     try:
         db.session.commit()
-    except SQLAlchemyError as errors:
+    except exc.SQLAlchemyError as errors:
         db.session.rollback()
         return jsonify(
             status="ERROR",
@@ -170,7 +194,15 @@ def update_one_journal(pk):
     if not json_data:
         return not_json()
 
-    journal_data = Journal.query.get_or_404(pk)
+    try:
+        journal_data = Journal.query.get_or_404(pk)
+    except exc.SQLAlchemyError as errors:
+        return jsonify(
+            status="ERROR",
+            message="DATABASE SESSION ERROR",
+            error=errors._message()
+        ), 500
+    
 
     if request.method == "PUT":    
         try:
@@ -188,7 +220,7 @@ def update_one_journal(pk):
         
     try:
         db.session.commit()
-    except SQLAlchemyError as errors:
+    except exc.SQLAlchemyError as errors:
         db.session.rollback()
         return jsonify(
             status="ERROR",
