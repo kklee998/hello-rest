@@ -5,6 +5,6 @@
 1. Create virtualenv (`python3 -m virtualenv venv`)
 2. Activate virtualenv (`source venv/bin/activate`)
 3. Install all requirements (`pip intall -r requirements.txt`)
-4. Set env to Development (`export FLASK_ENV=development`)
+4. cp .env.example .env
 5. Perform database migration (`flask db upgrade`)
 6. Start development server (`flask run`)

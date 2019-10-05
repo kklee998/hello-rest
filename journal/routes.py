@@ -4,17 +4,48 @@ from .models import db, Journal, JournalSchema
 
 from .utils import *
 
+# Initalise the schemas
 journal_schema = JournalSchema()
 journals_schema = JournalSchema(many=True)
 
+# https://flask.palletsprojects.com/en/1.1.x/blueprints/
+# Blueprints help with modular application. Useful for extending this project in the future
 journal = Blueprint('journal', __name__, url_prefix='/')
 
 @journal.route('/')
 def hello():
+    """
+    Return hello world at the root of URL
+    Can be used to check if application is running properly
+    """
     return "Hello world!"
 
 @journal.route("/journals", methods=["POST"])
 def create_journal():
+    """Accepts JSON and returns instance of created Journal
+
+    Example data:
+    HEADER: Content-Type: application/json
+
+    {
+	    "title": "New Journal",
+	    "content": "Something meaningful"
+    }
+
+    REQUIRED: title
+
+    Example Success Response:
+    {
+        "data": {
+            "content": "Something meaningful",
+            "creation_date": "2019-10-05T07:58:12",
+            "id": 4,
+            "title": "New Journal"
+        },
+        "message": "Journal created",
+        "status": "SUCCESS"
+    }
+    """
     json_data = request.get_json(force=True, silent=True)
 
     if not json_data:
@@ -27,8 +58,17 @@ def create_journal():
         return validation_error(errors)
 
     db.session.add(validated_data)
-    db.session.commit()
 
+    try:
+        db.session.commit()
+    except SQLAlchemyError as errors:
+        db.session.rollback()
+        return jsonify(
+            status="ERROR",
+            message="DATABASE SESSION ERROR",
+            error=errors
+        )
+    
     result = journal_schema.dump(validated_data)
 
     return jsonify(
@@ -39,6 +79,37 @@ def create_journal():
 
 @journal.route("/journals", methods=["GET"])
 def get_all_journals():
+    """Return all journals in the database
+    {
+    "data": [
+        {
+        "content": "Cant think of ", 
+        "creation_date": "2019-10-02T14:36:54", 
+        "id": 1, 
+        "title": "New Journal"
+        }, 
+        {
+        "content": "Cant think of ", 
+        "creation_date": "2019-10-02T14:36:58", 
+        "id": 2, 
+        "title": "2nd Journal"
+        }, 
+        {
+        "content": "Cant think of ", 
+        "creation_date": "2019-10-02T14:37:05", 
+        "id": 3, 
+        "title": "3rd Journal"
+        }, 
+        {
+        "content": "Something meaningful", 
+        "creation_date": "2019-10-05T07:58:12", 
+        "id": 4, 
+        "title": "New Journal"
+        }
+    ], 
+    "status": "SUCCESS
+    }
+    """
     journals = Journal.query.all()
     journal_data = journals_schema.dump(journals)
 
@@ -49,6 +120,21 @@ def get_all_journals():
 
 @journal.route("/journal/<pk>", methods=["GET"])
 def get_one_journal(pk):
+    """Return a single journal filter by id
+
+    Example URL: <server>/journal/4
+    
+    Example Response:
+    {
+    "data": {
+        "content": "Something meaningful", 
+        "creation_date": "2019-10-05T07:58:12", 
+        "id": 4, 
+        "title": "New Journal"
+    }, 
+    "status": "SUCCESS"
+    }
+    """
     journal = Journal.query.get_or_404(pk)
     journal_data = journal_schema.dump(journal)
 
@@ -59,14 +145,26 @@ def get_one_journal(pk):
 
 @journal.route("/journal/<pk>", methods=["DELETE"])
 def delete_one_journal(pk):
+    """Deletes a single journal based on id. Returns nothing
+    """
     journal = Journal.query.get_or_404(pk)
     db.session.delete(journal)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except SQLAlchemyError as errors:
+        db.session.rollback()
+        return jsonify(
+            status="ERROR",
+            message="DATABASE SESSION ERROR",
+            error=errors
+        )
 
     return jsonify(), 204
 
 @journal.route("/journal/<pk>", methods=["PUT", "PATCH"])
 def update_one_journal(pk):
+    """Updates a single journal based on provided JSON. Returns nothing
+    """
     json_data = request.get_json(force=True, silent=True)
 
     if not json_data:
@@ -88,7 +186,14 @@ def update_one_journal(pk):
         except ValidationError as errors:
             return validation_error(errors)
         
-
-    db.session.commit()
+    try:
+        db.session.commit()
+    except SQLAlchemyError as errors:
+        db.session.rollback()
+        return jsonify(
+            status="ERROR",
+            message="DATABASE SESSION ERROR",
+            error=errors
+        )
 
     return jsonify(), 204
