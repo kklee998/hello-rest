@@ -38,7 +38,7 @@ def create_journal():
     {
         "data": {
             "content": "Something meaningful",
-            "creation_date": "2019-10-05T07:58:12",
+            "updated_date": "2019-10-05T07:58:12",
             "id": 4,
             "title": "New Journal"
         },
@@ -84,25 +84,25 @@ def get_all_journals():
     "data": [
         {
         "content": "Cant think of ", 
-        "creation_date": "2019-10-02T14:36:54", 
+        "updated_date": "2019-10-02T14:36:54", 
         "id": 1, 
         "title": "New Journal"
         }, 
         {
         "content": "Cant think of ", 
-        "creation_date": "2019-10-02T14:36:58", 
+        "updated_date": "2019-10-02T14:36:58", 
         "id": 2, 
         "title": "2nd Journal"
         }, 
         {
         "content": "Cant think of ", 
-        "creation_date": "2019-10-02T14:37:05", 
+        "updated_date": "2019-10-02T14:37:05", 
         "id": 3, 
         "title": "3rd Journal"
         }, 
         {
         "content": "Something meaningful", 
-        "creation_date": "2019-10-05T07:58:12", 
+        "updated_date": "2019-10-05T07:58:12", 
         "id": 4, 
         "title": "New Journal"
         }
@@ -136,7 +136,7 @@ def get_one_journal(pk):
     {
     "data": {
         "content": "Something meaningful", 
-        "creation_date": "2019-10-05T07:58:12", 
+        "updated_date": "2019-10-05T07:58:12", 
         "id": 4, 
         "title": "New Journal"
     }, 
