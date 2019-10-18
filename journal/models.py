@@ -28,3 +28,4 @@ class JournalSchema(ma.ModelSchema):
     """
     class Meta:
         model = Journal
+        exclude = ("creation_date",)
