@@ -14,6 +14,11 @@ class Journal(db.Model):
         db.TIMESTAMP, 
         server_default=db.func.current_timestamp(), 
         nullable=False)
+    updated_date = db.Column(
+        db.TIMESTAMP, 
+        server_default=db.func.current_timestamp(),
+        onupdate=db.func.current_timestamp(),
+        nullable=False)
     content = db.Column(db.Text())
 
     def __repr__(self):
