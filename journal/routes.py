@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from .models import db, Journal, JournalSchema
 from sqlalchemy import exc
 
-from .utils import *
+from .utils import not_json, validation_error
 
 # Initalise the schemas
 journal_schema = JournalSchema()
@@ -49,7 +49,7 @@ def create_journal():
     json_data = request.get_json(force=True, silent=True)
 
     if not json_data:
-        return not_json()       
+        return not_json()
 
     try:
         validated_data = journal_schema.load(json_data)
@@ -68,7 +68,7 @@ def create_journal():
             message="DATABASE SESSION ERROR",
             error=errors._message()
         ), 500
-    
+
     result = journal_schema.dump(validated_data)
 
     return jsonify(
@@ -83,30 +83,30 @@ def get_all_journals():
     {
     "data": [
         {
-        "content": "Cant think of ", 
-        "updated_date": "2019-10-02T14:36:54", 
-        "id": 1, 
+        "content": "Cant think of ",
+        "updated_date": "2019-10-02T14:36:54",
+        "id": 1,
         "title": "New Journal"
-        }, 
+        },
         {
-        "content": "Cant think of ", 
-        "updated_date": "2019-10-02T14:36:58", 
-        "id": 2, 
+        "content": "Cant think of ",
+        "updated_date": "2019-10-02T14:36:58",
+        "id": 2,
         "title": "2nd Journal"
-        }, 
+        },
         {
-        "content": "Cant think of ", 
-        "updated_date": "2019-10-02T14:37:05", 
-        "id": 3, 
+        "content": "Cant think of ",
+        "updated_date": "2019-10-02T14:37:05",
+        "id": 3,
         "title": "3rd Journal"
-        }, 
+        },
         {
-        "content": "Something meaningful", 
-        "updated_date": "2019-10-05T07:58:12", 
-        "id": 4, 
+        "content": "Something meaningful",
+        "updated_date": "2019-10-05T07:58:12",
+        "id": 4,
         "title": "New Journal"
         }
-    ], 
+    ],
     "status": "SUCCESS
     }
     """
@@ -118,7 +118,7 @@ def get_all_journals():
             message="DATABASE SESSION ERROR",
             error=errors._message()
         ), 500
-        
+
     journal_data = journals_schema.dump(journals)
 
     return jsonify(
@@ -131,15 +131,15 @@ def get_one_journal(pk):
     """Return a single journal filter by id
 
     Example URL: <server>/journal/4
-    
+
     Example Response:
     {
     "data": {
-        "content": "Something meaningful", 
-        "updated_date": "2019-10-05T07:58:12", 
-        "id": 4, 
+        "content": "Something meaningful",
+        "updated_date": "2019-10-05T07:58:12",
+        "id": 4,
         "title": "New Journal"
-    }, 
+    },
     "status": "SUCCESS"
     }
     """
@@ -151,7 +151,7 @@ def get_one_journal(pk):
             message="DATABASE SESSION ERROR",
             error=errors._message()
         ), 500
-    
+
     journal_data = journal_schema.dump(journal)
 
     return jsonify(
@@ -171,7 +171,7 @@ def delete_one_journal(pk):
             message="DATABASE SESSION ERROR",
             error=errors._message()
         ), 500
-    
+
     db.session.delete(journal)
     try:
         db.session.commit()
@@ -202,9 +202,9 @@ def update_one_journal(pk):
             message="DATABASE SESSION ERROR",
             error=errors._message()
         ), 500
-    
 
-    if request.method == "PUT":    
+
+    if request.method == "PUT":
         try:
             journal_schema.load(json_data, instance=journal_data)
 
@@ -217,7 +217,7 @@ def update_one_journal(pk):
 
         except ValidationError as errors:
             return validation_error(errors)
-        
+
     try:
         db.session.commit()
     except exc.SQLAlchemyError as errors:
@@ -227,5 +227,5 @@ def update_one_journal(pk):
             message="DATABASE SESSION ERROR",
             error=errors
         )
-
     return jsonify(), 204
+
