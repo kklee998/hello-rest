@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from .models import db, Journal, JournalSchema
 from sqlalchemy import exc
 
-from .utils import not_json, validation_error
+from ..utils import not_json, validation_error
 
 # Initalise the schemas
 journal_schema = JournalSchema()

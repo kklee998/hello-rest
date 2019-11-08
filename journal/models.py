@@ -1,4 +1,4 @@
-from . import db, ma # Only importing the instance without having to re-create another
+from .. import db, ma # Only importing the instance without having to re-create another
 
 class Journal(db.Model):
 
