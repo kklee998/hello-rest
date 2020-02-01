@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from .models import db, Journal, JournalSchema
 from sqlalchemy import exc
+from marshmallow import ValidationError
 
 from ..utils import not_json, validation_error
 

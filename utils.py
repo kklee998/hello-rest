@@ -1,5 +1,4 @@
 from flask import jsonify
-from marshmallow import ValidationError
 
 """
 Utiliy functions that are constantly reused
